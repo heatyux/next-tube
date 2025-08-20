@@ -1,7 +1,9 @@
 import type { PropsWithChildren } from 'react'
 
-const HomeLayout = ({ children }: PropsWithChildren) => {
-  return <div>{children}</div>
+import { HomeLayout } from '@/modules/home/ui/layout/home-layout'
+
+const HomeRouteLayout = ({ children }: PropsWithChildren) => {
+  return <HomeLayout>{children}</HomeLayout>
 }
 
-export default HomeLayout
+export default HomeRouteLayout
