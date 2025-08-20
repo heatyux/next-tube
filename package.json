@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --check . --config .prettierrc.mjs",
+    "format:fix": "prettier --write . --config .prettierrc.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
