@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:webhook": "ngrok http --domain=albacore-holy-formally.ngrok-free.app 3000",
+    "dev:all": "concurrently \"bun run dev\" \"bun run dev:webhook\"",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
