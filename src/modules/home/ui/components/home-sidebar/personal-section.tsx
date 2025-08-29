@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuth, useClerk } from '@clerk/nextjs'
 import {
   HistoryIcon,
   ListVideoIcon,
@@ -46,6 +47,9 @@ const items: Item[] = [
 ]
 
 export const PersonalSection = () => {
+  const clerk = useClerk()
+  const { isSignedIn } = useAuth()
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>You</SidebarGroupLabel>
@@ -56,7 +60,12 @@ export const PersonalSection = () => {
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={false} // TODO: change to look at current pathname
-                onClick={() => {}} // TODO: add click handler
+                onClick={(e) => {
+                  if (!isSignedIn && item.auth) {
+                    e.preventDefault()
+                    return clerk.openSignIn()
+                  }
+                }}
                 asChild
               >
                 <Link href={item.url} className="flex items-center gap-4">
