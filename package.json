@@ -8,6 +8,8 @@
     "dev:all": "concurrently \"bun run dev\" \"bun run dev:webhook\"",
     "build": "next build --turbopack",
     "start": "next start",
+    "db:push": "bunx drizzle-kit push",
+    "db:studio": "bunx drizzle-kit studio",
     "lint": "eslint",
     "lint:fix": "next lint --fix",
     "format": "prettier --check . --config .prettierrc.mjs",
