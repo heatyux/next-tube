@@ -11,5 +11,8 @@
   "prettier.useEditorConfig": false,
   "prettier.useTabs": false,
   "editor.tabSize": 2,
-  "prettier.configPath": ".prettierrc.json"
+  "prettier.configPath": ".prettierrc.json",
+
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
