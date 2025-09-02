@@ -7,6 +7,7 @@ import superjson from 'superjson'
 
 import { db } from '@/db'
 import { users } from '@/db/schema'
+import { rateLimit } from '@/lib/rateLimit'
 
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth()
@@ -52,6 +53,15 @@ export const protectedProcedure = t.procedure.use(
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: "User doesn't exist in the database.",
+      })
+    }
+
+    const { success } = await rateLimit.limit(user.id)
+
+    if (!success) {
+      throw new TRPCError({
+        code: 'TOO_MANY_REQUESTS',
+        message: 'Rate limit exceeded',
       })
     }
 
