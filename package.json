@@ -10,6 +10,7 @@
     "start": "next start",
     "db:push": "bunx drizzle-kit push",
     "db:studio": "bunx drizzle-kit studio",
+    "db:seed": "bun src/scripts/seed-categories.ts",
     "lint": "eslint",
     "lint:fix": "next lint --fix",
     "format": "prettier --check . --config .prettierrc.mjs",
