@@ -1,13 +1,33 @@
 'use client'
 
+import { Suspense } from 'react'
+
+import { ErrorBoundary } from 'react-error-boundary'
+
+import { FilterCarousel } from '@/components/filter-carousel'
 import { trpc } from '@/trpc/client'
 
-type CategoriesSectionProps = {
+interface CategoriesSectionProps {
   categoryId?: string
 }
 
-export const CategoriesSection = ({}: CategoriesSectionProps) => {
+export const CategoriesSection = ({ categoryId }: CategoriesSectionProps) => {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <ErrorBoundary fallback={<p>Error...</p>}>
+        <CategoriesSectionSuspense categoryId={categoryId} />
+      </ErrorBoundary>
+    </Suspense>
+  )
+}
+
+const CategoriesSectionSuspense = ({ categoryId }: CategoriesSectionProps) => {
   const [categories] = trpc.category.getMany.useSuspenseQuery()
 
-  return <div>{JSON.stringify(categories)}</div>
+  const data = categories.map(({ id, name }) => ({
+    label: name,
+    value: id,
+  }))
+
+  return <FilterCarousel value={categoryId} data={data} />
 }
