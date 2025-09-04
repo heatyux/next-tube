@@ -14,15 +14,17 @@ interface CategoriesSectionProps {
 
 export const CategoriesSection = ({ categoryId }: CategoriesSectionProps) => {
   return (
-    <Suspense
-      fallback={<FilterCarousel isLoading data={[]} onSelect={() => {}} />}
-    >
+    <Suspense fallback={<CategoriseSkeleton />}>
       <ErrorBoundary fallback={<p>Error...</p>}>
         <CategoriesSectionSuspense categoryId={categoryId} />
       </ErrorBoundary>
     </Suspense>
   )
 }
+
+const CategoriseSkeleton = () => (
+  <FilterCarousel isLoading data={[]} onSelect={() => {}} />
+)
 
 const CategoriesSectionSuspense = ({ categoryId }: CategoriesSectionProps) => {
   const router = useRouter()
