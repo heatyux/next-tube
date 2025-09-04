@@ -16,15 +16,21 @@ import { Badge } from './ui/badge'
 import { Skeleton } from './ui/skeleton'
 
 interface FilterCarouselProps {
-  value?: string
+  value?: string | null
   isLoading?: boolean
+  onSelect: (value: string | null) => void
   data: {
     label: string
     value: string
   }[]
 }
 
-export const FilterCarousel = ({ isLoading, data }: FilterCarouselProps) => {
+export const FilterCarousel = ({
+  value,
+  isLoading,
+  onSelect,
+  data,
+}: FilterCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
@@ -67,9 +73,12 @@ export const FilterCarousel = ({ isLoading, data }: FilterCarouselProps) => {
               </CarouselItem>
             ))}
           {!isLoading && (
-            <CarouselItem className="basis-auto pl-3">
+            <CarouselItem
+              className="basis-auto pl-3"
+              onClick={() => onSelect(null)}
+            >
               <Badge
-                variant="secondary"
+                variant={!value ? 'default' : 'secondary'}
                 className="cursor-pointer rounded-lg px-3 py-1 text-sm whitespace-nowrap"
               >
                 All
@@ -78,9 +87,13 @@ export const FilterCarousel = ({ isLoading, data }: FilterCarouselProps) => {
           )}
           {!isLoading &&
             data.map((item) => (
-              <CarouselItem key={item.value} className="basis-auto pl-3">
+              <CarouselItem
+                key={item.value}
+                className="basis-auto pl-3"
+                onClick={() => onSelect(item.value)}
+              >
                 <Badge
-                  variant="secondary"
+                  variant={value === item.value ? 'default' : 'secondary'}
                   className="cursor-pointer rounded-lg px-3 py-1 text-sm whitespace-nowrap"
                 >
                   {item.label}
