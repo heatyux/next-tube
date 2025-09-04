@@ -13,16 +13,18 @@ import {
 import { cn } from '@/lib/utils'
 
 import { Badge } from './ui/badge'
+import { Skeleton } from './ui/skeleton'
 
 interface FilterCarouselProps {
   value?: string
+  isLoading?: boolean
   data: {
     label: string
     value: string
   }[]
 }
 
-export const FilterCarousel = ({ data }: FilterCarouselProps) => {
+export const FilterCarousel = ({ isLoading, data }: FilterCarouselProps) => {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
   const [count, setCount] = useState(0)
@@ -56,24 +58,35 @@ export const FilterCarousel = ({ data }: FilterCarouselProps) => {
         className="w-full px-12"
       >
         <CarouselContent className="-ml-3">
-          <CarouselItem className="basis-auto pl-3">
-            <Badge
-              variant="secondary"
-              className="cursor-pointer rounded-lg px-3 py-1 text-sm whitespace-nowrap"
-            >
-              All
-            </Badge>
-          </CarouselItem>
-          {data.map((item) => (
-            <CarouselItem key={item.value} className="basis-auto pl-3">
+          {isLoading &&
+            Array.from({ length: 14 }).map((_, index) => (
+              <CarouselItem key={index} className="basis-auto pl-3">
+                <Skeleton className="h-full w-[100px] rounded-lg px-3 py-1">
+                  &nbsp;
+                </Skeleton>
+              </CarouselItem>
+            ))}
+          {!isLoading && (
+            <CarouselItem className="basis-auto pl-3">
               <Badge
                 variant="secondary"
                 className="cursor-pointer rounded-lg px-3 py-1 text-sm whitespace-nowrap"
               >
-                {item.label}
+                All
               </Badge>
             </CarouselItem>
-          ))}
+          )}
+          {!isLoading &&
+            data.map((item) => (
+              <CarouselItem key={item.value} className="basis-auto pl-3">
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer rounded-lg px-3 py-1 text-sm whitespace-nowrap"
+                >
+                  {item.label}
+                </Badge>
+              </CarouselItem>
+            ))}
         </CarouselContent>
         <CarouselPrevious className="left-0 z-20" />
         <CarouselNext className="right-0 z-20" />
