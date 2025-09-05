@@ -14,6 +14,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
+import { StudioSidebarHeader } from './studio-sidebar-header'
+
 export const StudioSidebar = () => {
   const pathname = usePathname()
 
@@ -22,9 +24,10 @@ export const StudioSidebar = () => {
       <SidebarContent className="bg-background">
         <SidebarGroup>
           <SidebarMenu>
+            <StudioSidebarHeader />
             <SidebarMenuItem>
               <SidebarMenuButton
-                tooltip="Exit Studio"
+                tooltip="Your Studio"
                 isActive={pathname === '/studio'}
                 asChild
               >
