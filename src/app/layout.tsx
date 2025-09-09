@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Toaster } from 'sonner'
 
 import { TRPCProvider } from '@/trpc/client'
 
@@ -24,7 +25,10 @@ export default function RootLayout({
     <ClerkProvider afterSignOutUrl={'/'}>
       <html lang="en">
         <body className={`${inter.className} antialiased`}>
-          <TRPCProvider>{children}</TRPCProvider>
+          <TRPCProvider>
+            {children}
+            <Toaster />
+          </TRPCProvider>
         </body>
       </html>
     </ClerkProvider>
