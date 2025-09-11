@@ -1,5 +1,7 @@
 import Image from 'next/image'
 
+import { formatDuration } from '@/lib/utils'
+
 interface VideoThumbnailProps {
   imageUrl?: string | null
   previewUrl?: string | null
@@ -33,7 +35,7 @@ export const VideoThumbnail = ({
 
       {/* Video Duration Box */}
       <div className="absolute right-2 bottom-2 rounded bg-black/80 px-1 py-0.5 text-xs font-medium text-white">
-        {duration}
+        {formatDuration(duration)}
       </div>
     </div>
   )
