@@ -7,6 +7,8 @@ import { ResponsiveModal } from '@/components/responsive-modal'
 import { Button } from '@/components/ui/button'
 import { trpc } from '@/trpc/client'
 
+import { StudioUploader } from './studio-uploader'
+
 export const StudioUploadModal = () => {
   const utils = trpc.useUtils()
   const create = trpc.videos.create.useMutation({
@@ -35,10 +37,14 @@ export const StudioUploadModal = () => {
       </Button>
       <ResponsiveModal
         title="Upload a video"
-        open={!!create.data}
+        open={!!create.data?.url}
         onOpenChange={() => create.reset()}
       >
-        <p>This will be an upload</p>
+        {create.data?.url ? (
+          <StudioUploader endpoint={create.data.url} />
+        ) : (
+          <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
+        )}
       </ResponsiveModal>
     </>
   )
