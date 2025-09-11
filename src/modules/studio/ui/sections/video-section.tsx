@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DEFAULT_LIMIT } from '@/constants'
+import { VideoThumbnail } from '@/modules/videos/server/ui/components/video-thumbnail'
 import { trpc } from '@/trpc/client'
 
 export const VideosSection = () => {
@@ -71,7 +72,13 @@ const VideosSectionSuspense = () => {
                   onClick={() => router.push(`/studio/videos/${video.id}`)}
                   className="cursor-pointer"
                 >
-                  <TableCell>{video.title}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-4">
+                      <div className="relative aspect-video w-36 shrink-0">
+                        <VideoThumbnail imageUrl={video.thumbnailUrl} />
+                      </div>
+                    </div>
+                  </TableCell>
                   <TableCell>Visibility</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Date</TableCell>
