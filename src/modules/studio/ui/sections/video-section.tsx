@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect, useState } from 'react'
 
+import { format } from 'date-fns'
+import { Globe2Icon, LockIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -93,13 +95,26 @@ const VideosSectionSuspense = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>Visibility</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      {video.visibility === 'private' ? (
+                        <LockIcon className="mr-2 size-4" />
+                      ) : (
+                        <Globe2Icon className="mr-2 size-4" />
+                      )}
+                      <span>{snakeCaseToTitle(video.visibility)}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       {snakeCaseToTitle(video.muxStatus ?? 'error')}
                     </div>
                   </TableCell>
-                  <TableCell>Date</TableCell>
+                  <TableCell>
+                    <div className="truncate text-sm">
+                      {format(new Date(video.createdAt), 'd MMM yyyy')}
+                    </div>
+                  </TableCell>
                   <TableCell>Views</TableCell>
                   <TableCell>Comments</TableCell>
                   <TableCell>Likes</TableCell>
