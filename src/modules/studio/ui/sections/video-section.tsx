@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { InfiniteScroll } from '@/components/infinite-scroll'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -31,11 +32,66 @@ export const VideosSection = () => {
   if (!isMounted) return null
 
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<VideosSectionSkeleton />}>
       <ErrorBoundary fallback={<p>Error</p>}>
         <VideosSectionSuspense />
       </ErrorBoundary>
     </Suspense>
+  )
+}
+
+const VideosSectionSkeleton = () => {
+  return (
+    <>
+      <div className="border-y">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[510px] pl-6">Video</TableHead>
+              <TableHead>Visibility</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Views</TableHead>
+              <TableHead className="text-right">Comments</TableHead>
+              <TableHead className="pr-6 text-right">Likes</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell className="pl-6">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-20 w-36" />
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-4 w-[100px]" />
+                      <Skeleton className="h-4 w-[100px]" />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell className="text-right text-sm">
+                  <Skeleton className="ml-auto h-4 w-12" />
+                </TableCell>
+                <TableCell className="text-right text-sm">
+                  <Skeleton className="ml-auto h-4 w-12" />
+                </TableCell>
+                <TableCell className="pr-6 text-right text-sm">
+                  <Skeleton className="ml-auto h-4 w-12" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   )
 }
 
@@ -52,8 +108,8 @@ const VideosSectionSuspense = () => {
   )
 
   return (
-    <div className="h-[200px]">
-      <div>
+    <div>
+      <div className="border-y">
         <Table>
           <TableHeader>
             <TableRow>
@@ -75,7 +131,7 @@ const VideosSectionSuspense = () => {
                   onClick={() => router.push(`/studio/videos/${video.id}`)}
                   className="cursor-pointer"
                 >
-                  <TableCell>
+                  <TableCell className="pl-6">
                     <div className="flex items-center gap-4">
                       <div className="relative aspect-video w-36 shrink-0">
                         <VideoThumbnail
@@ -115,9 +171,9 @@ const VideosSectionSuspense = () => {
                       {format(new Date(video.createdAt), 'd MMM yyyy')}
                     </div>
                   </TableCell>
-                  <TableCell>Views</TableCell>
-                  <TableCell>Comments</TableCell>
-                  <TableCell>Likes</TableCell>
+                  <TableCell className="text-right">Views</TableCell>
+                  <TableCell className="text-right">Comments</TableCell>
+                  <TableCell className="pr-6 text-right">Likes</TableCell>
                 </TableRow>
               ))}
           </TableBody>
