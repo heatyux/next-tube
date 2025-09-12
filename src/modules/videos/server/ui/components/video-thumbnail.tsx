@@ -23,12 +23,14 @@ export const VideoThumbnail = ({
           src={imageUrl ?? '/placeholder.svg'}
           alt={title}
           fill
+          unoptimized
           className="size-full object-cover opacity-100 transition-opacity duration-300 group-hover:opacity-0"
         />
         <Image
           src={previewUrl ?? '/placeholder.svg'}
           alt={title}
           fill
+          unoptimized={!!previewUrl}
           className="size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         />
       </div>
