@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -50,17 +51,28 @@ export const FormSection = ({ videoId }: FormSectionProps) => {
 }
 
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
+  const utils = trpc.useUtils()
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId })
   // HACK: Ideally, the select part of the form should be on its own component to avoid long loading times
   const [categories] = trpc.category.getMany.useSuspenseQuery()
+
+  const update = trpc.videos.update.useMutation({
+    onSuccess: () => {
+      utils.studio.getOne.invalidate({ id: videoId })
+      utils.studio.getMany.invalidate()
+
+      toast.success('Video updated successfully')
+    },
+    onError: (error) => toast.error(error.message),
+  })
 
   const form = useForm<z.infer<typeof videoUpdateSchema>>({
     resolver: zodResolver(videoUpdateSchema),
     defaultValues: video,
   })
 
-  const onSubmit = (data: z.infer<typeof videoUpdateSchema>) => {
-    console.log(data)
+  const onSubmit = async (data: z.infer<typeof videoUpdateSchema>) => {
+    await update.mutateAsync(data)
   }
 
   return (
@@ -74,8 +86,10 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             </h3>
           </div>
           <div className="flex items-center gap-x-2">
-            {/* TODO: Make the disabled prop of the button dynamic */}
-            <Button type="submit" disabled={false}>
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || update.isPending}
+            >
               Save
             </Button>
             <DropdownMenu>
@@ -93,7 +107,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             </DropdownMenu>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
           <div className="space-y-8 lg:col-span-3">
             <FormField
               control={form.control}
@@ -133,6 +147,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             <FormField
               control={form.control}
               name="categoryId"
+              disabled={categories.length === 0}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
