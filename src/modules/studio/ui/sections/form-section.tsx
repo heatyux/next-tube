@@ -12,6 +12,7 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -61,6 +62,8 @@ export const FormSection = ({ videoId }: FormSectionProps) => {
 }
 
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
+  const router = useRouter()
+
   const [isCopied, setIsCopied] = useState(false)
 
   const utils = trpc.useUtils()
@@ -72,10 +75,27 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     onSuccess: () => {
       utils.studio.getOne.invalidate({ id: videoId })
       utils.studio.getMany.invalidate()
-
       toast.success('Video updated successfully')
+
+      setTimeout(() => {
+        router.push('/sutdio')
+      }, 1000)
     },
     onError: (error) => toast.error(error.message),
+  })
+
+  const remove = trpc.videos.remove.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate()
+      toast.success('Video deleted successfully')
+
+      setTimeout(() => {
+        router.push('/sutdio')
+      }, 1000)
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
   })
 
   const form = useForm<z.infer<typeof videoUpdateSchema>>({
@@ -127,7 +147,9 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => remove.mutate({ id: videoId })}
+                >
                   <TrashIcon className="mr-2 size-4" />
                   <span>Delete</span>
                 </DropdownMenuItem>
