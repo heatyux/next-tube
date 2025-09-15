@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import {
   CopyCheckIcon,
   CopyIcon,
+  Globe2Icon,
+  LockIcon,
   MoreVerticalIcon,
   TrashIcon,
 } from 'lucide-react'
@@ -40,6 +42,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { videoUpdateSchema } from '@/db/schema'
+import { snakeCaseToTitle } from '@/lib/utils'
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player'
 import { trpc } from '@/trpc/client'
 
@@ -108,7 +111,12 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
           <div className="flex items-center gap-x-2">
             <Button
               type="submit"
-              disabled={form.formState.isSubmitting || update.isPending}
+              disabled={
+                form.formState.isSubmitting ||
+                update.isPending ||
+                !form.formState.isValid ||
+                !form.formState.isDirty
+              }
             >
               Save
             </Button>
@@ -224,8 +232,62 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     </div>
                   </div>
                 </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-muted-foreground text-xs">
+                      Video Status
+                    </p>
+                    <p className="text-sm">
+                      {snakeCaseToTitle(video.muxStatus ?? 'Preparing')}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-muted-foreground text-xs">
+                      Subtitles Status
+                    </p>
+                    <p className="text-sm">
+                      {snakeCaseToTitle(video.muxTrackStatus ?? 'No Subtitles')}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
+            <FormField
+              control={form.control}
+              name="visibility"
+              disabled={categories.length === 0}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Visibility</FormLabel>
+                  <Select
+                    defaultValue={field.value ?? undefined}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select visibility" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="public">
+                        <div className="flex">
+                          <Globe2Icon className="mr-2 size-4" />
+                          Public
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="private">
+                        <div className="flex">
+                          <LockIcon className="mr-2 size-4" />
+                          Private
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
           </div>
         </div>
       </form>
