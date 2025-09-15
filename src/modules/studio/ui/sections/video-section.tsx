@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table'
 import { DEFAULT_LIMIT } from '@/constants'
 import { snakeCaseToTitle } from '@/lib/utils'
-import { VideoThumbnail } from '@/modules/videos/server/ui/components/video-thumbnail'
+import { VideoThumbnail } from '@/modules/videos/ui/components/video-thumbnail'
 import { trpc } from '@/trpc/client'
 
 export const VideosSection = () => {
