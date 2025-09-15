@@ -10,16 +10,21 @@ import { Button } from '@/components/ui/button'
 
 interface StudioUploaderProps {
   endpoint: string
+  onSuccess: () => void
 }
 
 const UPLOADER_ID = 'video_uploader'
 
-export const StudioUploader = ({ endpoint }: StudioUploaderProps) => {
+export const StudioUploader = ({
+  endpoint,
+  onSuccess,
+}: StudioUploaderProps) => {
   return (
     <div>
       <MuxUploader
         id={UPLOADER_ID}
         endpoint={endpoint}
+        onSuccess={onSuccess}
         className="group/uploader hidden"
       />
       <MuxUploaderDrop muxUploader={UPLOADER_ID} className="group/drop">

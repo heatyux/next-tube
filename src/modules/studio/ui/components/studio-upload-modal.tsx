@@ -1,6 +1,7 @@
 'use client'
 
 import { Loader2Icon, PlusIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { ResponsiveModal } from '@/components/responsive-modal'
@@ -10,6 +11,8 @@ import { trpc } from '@/trpc/client'
 import { StudioUploader } from './studio-uploader'
 
 export const StudioUploadModal = () => {
+  const router = useRouter()
+
   const utils = trpc.useUtils()
   const create = trpc.videos.create.useMutation({
     onSuccess: () => {
@@ -20,6 +23,15 @@ export const StudioUploadModal = () => {
       toast.error(error.message)
     },
   })
+
+  const onSuccess = () => {
+    if (!create.data?.video.id) {
+      return
+    }
+
+    create.reset()
+    router.push(`/studio/videos/${create.data.video.id}`)
+  }
 
   return (
     <>
@@ -41,7 +53,7 @@ export const StudioUploadModal = () => {
         onOpenChange={() => create.reset()}
       >
         {create.data?.url ? (
-          <StudioUploader endpoint={create.data.url} />
+          <StudioUploader endpoint={create.data.url} onSuccess={onSuccess} />
         ) : (
           <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
         )}
