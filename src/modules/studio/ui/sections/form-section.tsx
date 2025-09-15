@@ -1,9 +1,15 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import {
+  CopyCheckIcon,
+  CopyIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
+import Link from 'next/link'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -34,6 +40,7 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { videoUpdateSchema } from '@/db/schema'
+import { VideoPlayer } from '@/modules/videos/ui/components/video-player'
 import { trpc } from '@/trpc/client'
 
 interface FormSectionProps {
@@ -51,6 +58,8 @@ export const FormSection = ({ videoId }: FormSectionProps) => {
 }
 
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
+  const [isCopied, setIsCopied] = useState(false)
+
   const utils = trpc.useUtils()
   const [video] = trpc.studio.getOne.useSuspenseQuery({ id: videoId })
   // HACK: Ideally, the select part of the form should be on its own component to avoid long loading times
@@ -73,6 +82,17 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
 
   const onSubmit = async (data: z.infer<typeof videoUpdateSchema>) => {
     await update.mutateAsync(data)
+  }
+
+  const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}/video/${videoId}`
+
+  const onCopy = async () => {
+    await navigator.clipboard.writeText(fullUrl)
+    setIsCopied(true)
+
+    setTimeout(() => {
+      setIsCopied(false)
+    }, 2000)
   }
 
   return (
@@ -172,6 +192,40 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 </FormItem>
               )}
             />
+          </div>
+          <div className="flex flex-col gap-y-8 lg:col-span-2">
+            <div className="relative flex h-fit flex-col gap-4 overflow-hidden rounded-xl bg-[#F9f9F9]">
+              <div className="relative aspect-video overflow-hidden">
+                <VideoPlayer
+                  playbackId={video.muxPlaybackId}
+                  thumbnailUrl={video.thumbnailUrl}
+                />
+              </div>
+              <div className="flex flex-col gap-y-6 p-4">
+                <div className="flex items-center justify-between gap-y-2">
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-muted-foreground text-xs">Video Link</p>
+                    <div className="flex items-center gap-x-2">
+                      <Link href={`/videos/${video.id}`}>
+                        <p className="line-clamp-1 text-sm text-blue-500">
+                          {fullUrl}
+                        </p>
+                      </Link>
+                      <Button
+                        type="button"
+                        disabled={isCopied}
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                        onClick={onCopy}
+                      >
+                        {isCopied ? <CopyCheckIcon /> : <CopyIcon />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </form>
