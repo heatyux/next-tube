@@ -183,10 +183,10 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                   <FormControl>
                     <Textarea
                       {...field}
-                      value={field.value ?? 'No description'}
+                      value={field.value ?? ''}
                       rows={10}
                       placeholder="Add a description to your video"
-                      className="resize-none pr-10"
+                      className="field-sizing-fixed min-h-0 resize-none pr-10"
                     />
                   </FormControl>
                   <FormMessage />
@@ -206,11 +206,11 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     onValueChange={field.onChange}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="w-full">
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
@@ -288,7 +288,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     onValueChange={field.onChange}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select visibility" />
                       </SelectTrigger>
                     </FormControl>
