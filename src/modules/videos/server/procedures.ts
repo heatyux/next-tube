@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { and, eq } from 'drizzle-orm'
+import { UTApi } from 'uploadthing/server'
 import z from 'zod'
 
 import { db } from '@/db'
@@ -108,6 +109,17 @@ export const videosRouter = createTRPCRouter({
 
       if (!existingVideo) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Video not found' })
+      }
+
+      if (existingVideo.thumbnailKey) {
+        const utApi = new UTApi()
+
+        await utApi.deleteFiles(existingVideo.thumbnailKey)
+
+        await db
+          .update(videos)
+          .set({ thumbnailKey: null, thumbnailUrl: null })
+          .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
       }
 
       if (!existingVideo.muxPlaybackId) {
