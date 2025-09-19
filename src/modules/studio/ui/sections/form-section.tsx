@@ -126,6 +126,17 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     }, 2000)
   }
 
+  const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
+    onSuccess: () => {
+      utils.studio.getOne.invalidate({ id: videoId })
+      utils.studio.getMany.invalidate()
+      toast.success('Thumbnail restored successfully')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
   return (
     <>
       <Form {...form}>
@@ -240,7 +251,11 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                               <SparklesIcon className="mr-1 size-5" />
                               AI generated
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                restoreThumbnail.mutate({ id: videoId })
+                              }
+                            >
                               <RotateCcwIcon className="mr-1 size-5" />
                               Restore
                             </DropdownMenuItem>
