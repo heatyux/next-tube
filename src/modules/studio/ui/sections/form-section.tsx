@@ -86,7 +86,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       toast.success('Video updated successfully')
 
       setTimeout(() => {
-        router.push('/sutdio')
+        router.push('/studio')
       }, 1000)
     },
     onError: (error) => toast.error(error.message),
@@ -98,7 +98,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       toast.success('Video deleted successfully')
 
       setTimeout(() => {
-        router.push('/sutdio')
+        router.push('/studio')
       }, 1000)
     },
     onError: (error) => {
