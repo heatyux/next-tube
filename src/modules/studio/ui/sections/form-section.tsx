@@ -8,9 +8,11 @@ import {
   CopyIcon,
   Globe2Icon,
   ImagePlusIcon,
+  Loader2Icon,
   LockIcon,
   MoreVerticalIcon,
   RotateCcwIcon,
+  SparkleIcon,
   SparklesIcon,
   TrashIcon,
 } from 'lucide-react'
@@ -137,6 +139,16 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   })
 
+  const generateTitle = trpc.videos.generateTitle.useMutation({
+    onSuccess: () => {
+      utils.studio.getOne.invalidate({ id: videoId })
+      toast.success('Title generated')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
   return (
     <>
       <Form {...form}>
@@ -184,8 +196,27 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    {/* TODO: Add AI generate button */}
+                    <FormLabel>
+                      <div className="flex items-center gap-x-2">
+                        Title
+                        <Button
+                          type="button"
+                          disabled={
+                            generateTitle.isPending || !video.muxTrackId
+                          }
+                          variant="ghost"
+                          size="icon"
+                          className="size-6 rounded-full"
+                          onClick={() => generateTitle.mutate({ id: videoId })}
+                        >
+                          {generateTitle.isPending ? (
+                            <Loader2Icon className="size-3 animate-spin" />
+                          ) : (
+                            <SparkleIcon className="size-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         {...field}

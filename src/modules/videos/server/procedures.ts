@@ -6,6 +6,7 @@ import z from 'zod'
 import { db } from '@/db'
 import { videoUpdateSchema, videos } from '@/db/schema'
 import { mux } from '@/lib/mux'
+import { workflow } from '@/lib/workflow'
 import { createTRPCRouter, protectedProcedure } from '@/trpc/init'
 
 export const videosRouter = createTRPCRouter({
@@ -147,5 +148,16 @@ export const videosRouter = createTRPCRouter({
         .returning()
 
       return updatedVideo
+    }),
+  generateTitle: protectedProcedure
+    .input(z.object({ id: z.uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user
+      const { workflowRunId } = await workflow.trigger({
+        url: `${process.env.NEXT_PUBLIC_APP_URL}/api/videos/workflows/title`,
+        body: { userId, videoId: input.id },
+      })
+
+      return workflowRunId
     }),
 })
