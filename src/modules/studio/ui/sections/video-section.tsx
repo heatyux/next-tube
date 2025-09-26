@@ -141,11 +141,9 @@ const VideosSectionSuspense = () => {
                           duration={video.duration ?? 0}
                         />
                       </div>
-                      <div className="flex flex-col gap-y-1 overflow-hidden">
-                        <span className="line-clamp-1 text-sm">
-                          {video.title}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
+                      <div className="flex max-w-sm flex-col gap-y-1">
+                        <span className="truncate text-sm">{video.title}</span>
+                        <span className="text-muted-foreground truncate text-xs">
                           {video.description ?? 'No description'}
                         </span>
                       </div>
