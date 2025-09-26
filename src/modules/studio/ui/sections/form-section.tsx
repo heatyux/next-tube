@@ -149,6 +149,19 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   })
 
+  const generateDescription = trpc.videos.generateDescription.useMutation({
+    onSuccess: () => {
+      utils.studio.getOne.invalidate({ id: videoId })
+      toast.success('Description generated')
+      setTimeout(() => {
+        router.push('/studio')
+      }, 1000)
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
   return (
     <>
       <Form {...form}>
@@ -232,8 +245,29 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    {/* TODO: Add AI generate button */}
+                    <FormLabel>
+                      <div className="flex items-center gap-x-2">
+                        Description
+                        <Button
+                          type="button"
+                          disabled={
+                            generateDescription.isPending || !video.muxTrackId
+                          }
+                          variant="ghost"
+                          size="icon"
+                          className="size-6 rounded-full"
+                          onClick={() =>
+                            generateDescription.mutate({ id: videoId })
+                          }
+                        >
+                          {generateDescription.isPending ? (
+                            <Loader2Icon className="size-3 animate-spin" />
+                          ) : (
+                            <SparkleIcon className="size-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
