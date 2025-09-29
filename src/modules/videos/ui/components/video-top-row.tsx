@@ -1,4 +1,5 @@
 import { VideoGetOneOutput } from '../../types'
+import { VideoMenu } from './video-menu'
 import { VideoOwner } from './video-owner'
 import { VideoReactions } from './video-reactions'
 
@@ -14,6 +15,7 @@ export const VideoTopRow = ({ video }: VideoTopRowProps) => {
         <VideoOwner user={video.user} videoId={video.id} />
         <div className="-mb-2 flex gap-2 overflow-x-auto pb-2 sm:min-w-[calc(50%-6px)] sm:justify-end sm:overflow-visible">
           <VideoReactions />
+          <VideoMenu videoId={video.id} variant="secondary" />
         </div>
       </div>
     </div>
