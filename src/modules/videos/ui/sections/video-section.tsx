@@ -9,6 +9,7 @@ import { trpc } from '@/trpc/client'
 
 import { VideoBanner } from '../components/video-banner'
 import { VideoPlayer } from '../components/video-player'
+import { VideoTopRow } from '../components/video-top-row'
 
 interface VideoSectionProps {
   videoId: string
@@ -43,6 +44,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         />
       </div>
       <VideoBanner status={video.muxStatus} />
+      <VideoTopRow video={video} />
     </>
   )
 }
