@@ -4,7 +4,13 @@ import { UTApi } from 'uploadthing/server'
 import z from 'zod'
 
 import { db } from '@/db'
-import { users, videoUpdateSchema, videoViews, videos } from '@/db/schema'
+import {
+  users,
+  videoReactions,
+  videoUpdateSchema,
+  videoViews,
+  videos,
+} from '@/db/schema'
 import { mux } from '@/lib/mux'
 import { workflow } from '@/lib/workflow'
 import {
@@ -24,6 +30,20 @@ export const videosRouter = createTRPCRouter({
             ...getTableColumns(users),
           },
           videoViews: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, 'like'),
+            ),
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, 'dislike'),
+            ),
+          ),
         })
         .from(videos)
         .innerJoin(users, eq(videos.userId, users.id))
