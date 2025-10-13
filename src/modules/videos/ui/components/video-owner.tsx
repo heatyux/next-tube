@@ -1,20 +1,27 @@
 import { useAuth } from '@clerk/nextjs'
 import Link from 'next/link'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/user-avatar'
-import { userSelectSchema } from '@/db/schema'
+import { useSubscription } from '@/modules/subscriptions/hooks/use-subscription'
 import { SubscriptionButton } from '@/modules/subscriptions/ui/components/subscription-button'
 import { UserInfo } from '@/modules/users/ui/components/user-info'
 
+import { VideoGetOneOutput } from '../../types'
+
 interface VideoOwnerProps {
-  user: z.infer<typeof userSelectSchema>
+  user: VideoGetOneOutput['user']
   videoId: string
 }
 
 export const VideoOwner = ({ user, videoId }: VideoOwnerProps) => {
-  const { userId } = useAuth()
+  const { userId, isLoaded } = useAuth()
+
+  const { isPending, onClick } = useSubscription({
+    userId: user.id,
+    isSubscribed: user.viewerSubcribed,
+    fromVideoId: videoId,
+  })
 
   return (
     <div className="flex min-w-0 items-center justify-between gap-3 sm:items-start sm:justify-start">
@@ -24,8 +31,8 @@ export const VideoOwner = ({ user, videoId }: VideoOwnerProps) => {
           <div className="flex min-w-0 flex-col gap-1">
             <UserInfo size="default" name={user.name} />
             <span className="text-muted-foreground line-clamp-1 text-sm">
-              {/* TODO: Properly fill in the subscribers */}
-              {0} Subscribers
+              {user.subscriberCount}{' '}
+              {user.subscriberCount >= 1 ? 'subscribers' : 'subscriber'}
             </span>
           </div>
         </div>
@@ -36,10 +43,10 @@ export const VideoOwner = ({ user, videoId }: VideoOwnerProps) => {
         </Button>
       ) : (
         <SubscriptionButton
-          disabled={false}
-          isSubscribed={false}
+          disabled={isPending || !isLoaded}
+          isSubscribed={user.viewerSubcribed}
           size="default"
-          onClick={() => {}}
+          onClick={onClick}
           className="flex-none"
         />
       )}
