@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server'
+import { and, eq } from 'drizzle-orm'
 import z from 'zod'
 
 import { db } from '@/db'
@@ -24,5 +25,29 @@ export const subscriptionsRouter = createTRPCRouter({
         .returning()
 
       return createdSubscription
+    }),
+  remove: protectedProcedure
+    .input(z.object({ userId: z.uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = input
+
+      if (userId === ctx.user.id) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You cannot unsubscribe to yourself',
+        })
+      }
+
+      const [deletedSubscription] = await db
+        .delete(subscriptions)
+        .where(
+          and(
+            eq(subscriptions.viewerId, ctx.user.id),
+            eq(subscriptions.creatorId, userId),
+          ),
+        )
+        .returning()
+
+      return deletedSubscription
     }),
 })
