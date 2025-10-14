@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 
 import { ErrorBoundary } from 'react-error-boundary'
 
+import { CommentsForm } from '@/modules/comments/ui/components/comments-form'
 import { trpc } from '@/trpc/client'
 
 interface CommentsSectionProps {
@@ -23,5 +24,13 @@ export const CommentsSection = ({ videoId }: CommentsSectionProps) => {
 const CommentsSectionSuspense = ({ videoId }: CommentsSectionProps) => {
   const [comments] = trpc.comments.getMany.useSuspenseQuery({ videoId })
 
-  return <>{JSON.stringify(comments)}</>
+  return (
+    <div className="mt-6">
+      <div className="flex flex-col gap-6">
+        <h1>0 Comments</h1>
+        <CommentsForm videoId={videoId} />
+      </div>
+      {JSON.stringify(comments)}
+    </div>
+  )
 }
