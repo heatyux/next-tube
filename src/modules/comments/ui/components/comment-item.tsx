@@ -6,7 +6,7 @@ import { UserAvatar } from '@/components/user-avatar'
 import { CommentGetManyOutput } from '../../types'
 
 interface CommentItemProps {
-  comment: CommentGetManyOutput[number]
+  comment: CommentGetManyOutput['items'][number]
 }
 
 export const CommentItem = ({ comment }: CommentItemProps) => {
