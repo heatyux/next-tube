@@ -143,7 +143,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     onSuccess: () => {
       utils.studio.getOne.invalidate({ id: videoId })
       utils.studio.getMany.invalidate()
-      toast.success('Video updated successfully')
+      toast.success('Video updated')
 
       setTimeout(() => {
         router.push('/studio')
@@ -155,7 +155,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   const remove = trpc.videos.remove.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate()
-      toast.success('Video deleted successfully')
+      toast.success('Video deleted')
 
       setTimeout(() => {
         router.push('/studio')
@@ -190,7 +190,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     onSuccess: () => {
       utils.studio.getOne.invalidate({ id: videoId })
       utils.studio.getMany.invalidate()
-      toast.success('Thumbnail restored successfully')
+      toast.success('Thumbnail restored')
     },
     onError: (error) => {
       toast.error(error.message)
