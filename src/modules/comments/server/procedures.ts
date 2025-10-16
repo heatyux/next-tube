@@ -71,14 +71,14 @@ export const commentsRouter = createTRPCRouter({
           .where(inArray(commentReactions.userId, userId ? [userId] : [])),
       )
 
-      const [[totalData], commentsData] = await Promise.all([
+      const [totalData, commentsData] = await Promise.all([
         await db
-          .with(viewerReactions)
           .select({ count: count() })
           .from(comments)
           .where(eq(comments.videoId, videoId)),
 
         await db
+          .with(viewerReactions)
           .select({
             ...getTableColumns(comments),
             user: users,
@@ -114,10 +114,7 @@ export const commentsRouter = createTRPCRouter({
             ),
           )
           .innerJoin(users, eq(users.id, comments.userId))
-          .innerJoin(
-            viewerReactions,
-            eq(viewerReactions.commentId, comments.id),
-          )
+          .leftJoin(viewerReactions, eq(comments.id, viewerReactions.commentId))
           .orderBy(desc(comments.updatedAt), desc(comments.id))
           .limit(limit + 1),
       ])
@@ -136,7 +133,7 @@ export const commentsRouter = createTRPCRouter({
       return {
         items,
         nextCursor,
-        totalCount: totalData.count,
+        totalCount: totalData[0].count,
       }
     }),
   remove: protectedProcedure

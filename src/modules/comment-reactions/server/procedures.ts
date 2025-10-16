@@ -32,10 +32,8 @@ export const commentReactionsRouter = createTRPCRouter({
           .delete(commentReactions)
           .where(
             and(
-              eq(
-                commentReactions.commentId,
-                eq(commentReactions.userId, userId),
-              ),
+              eq(commentReactions.commentId, commentId),
+              eq(commentReactions.userId, userId),
             ),
           )
           .returning()
