@@ -3,7 +3,7 @@ import { and, count, desc, eq, getTableColumns, lt, or } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db'
-import { comments, users } from '@/db/schema'
+import { commentReactions, comments, users } from '@/db/schema'
 import {
   baseProcedure,
   createTRPCRouter,
@@ -50,6 +50,20 @@ export const commentsRouter = createTRPCRouter({
           .select({
             ...getTableColumns(comments),
             user: users,
+            likeCount: db.$count(
+              commentReactions,
+              and(
+                eq(commentReactions.type, 'like'),
+                eq(commentReactions.commentId, comments.id),
+              ),
+            ),
+            dislikeCount: db.$count(
+              commentReactions,
+              and(
+                eq(commentReactions.type, 'dislike'),
+                eq(commentReactions.commentId, comments.id),
+              ),
+            ),
           })
           .from(comments)
           .where(
@@ -70,35 +84,6 @@ export const commentsRouter = createTRPCRouter({
           .orderBy(desc(comments.updatedAt), desc(comments.id))
           .limit(limit + 1),
       ])
-
-      // const [totalData] = await db
-      //   .select({ count: count() })
-      //   .from(comments)
-      //   .where(eq(comments.videoId, videoId))
-
-      // const commentsData = await db
-      //   .select({
-      //     ...getTableColumns(comments),
-      //     user: users,
-      //   })
-      //   .from(comments)
-      //   .where(
-      //     and(
-      //       eq(comments.videoId, videoId),
-      //       cursor
-      //         ? or(
-      //             lt(comments.updatedAt, cursor.updatedAt),
-      //             and(
-      //               eq(comments.updatedAt, cursor.updatedAt),
-      //               lt(comments.id, cursor.id),
-      //             ),
-      //           )
-      //         : undefined,
-      //     ),
-      //   )
-      //   .innerJoin(users, eq(users.id, comments.userId))
-      //   .orderBy(desc(comments.updatedAt), desc(comments.id))
-      //   .limit(limit + 1)
 
       const hasMore = commentsData.length > limit
 
