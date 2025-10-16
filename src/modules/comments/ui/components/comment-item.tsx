@@ -1,6 +1,12 @@
 import { useAuth, useClerk } from '@clerk/nextjs'
 import { formatDistanceToNow } from 'date-fns'
-import { MessageSquareIcon, MoreVerticalIcon, Trash2Icon } from 'lucide-react'
+import {
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
@@ -62,7 +68,32 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
             </div>
           </Link>
           <p className="text-sm">{comment.value}</p>
-          {/* TODO: Reactions */}
+          <div className="mt-1 flex items-center gap-2">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 rounded-full"
+              >
+                <ThumbsUpIcon />
+              </Button>
+              <span className="text-muted-foreground text-xs">
+                {comment.likeCount}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8 rounded-full"
+              >
+                <ThumbsDownIcon />
+              </Button>
+              <span className="text-muted-foreground text-xs">
+                {comment.dislikeCount}
+              </span>
+            </div>
+          </div>
         </div>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
