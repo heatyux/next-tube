@@ -1,5 +1,14 @@
 import { TRPCError } from '@trpc/server'
-import { and, count, desc, eq, getTableColumns, lt, or } from 'drizzle-orm'
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  lt,
+  or,
+} from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db'
@@ -37,11 +46,34 @@ export const commentsRouter = createTRPCRouter({
         limit: z.number().min(1).max(100),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      const { clerkUserId } = ctx
       const { videoId, cursor, limit } = input
+
+      let userId
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(inArray(users.clerkId, clerkUserId ? [clerkUserId] : []))
+
+      if (user) {
+        userId = user.id
+      }
+
+      const viewerReactions = db.$with('comment_reactions').as(
+        db
+          .select({
+            commentId: commentReactions.commentId,
+            type: commentReactions.type,
+          })
+          .from(commentReactions)
+          .where(inArray(commentReactions.userId, userId ? [userId] : [])),
+      )
 
       const [[totalData], commentsData] = await Promise.all([
         await db
+          .with(viewerReactions)
           .select({ count: count() })
           .from(comments)
           .where(eq(comments.videoId, videoId)),
@@ -50,6 +82,7 @@ export const commentsRouter = createTRPCRouter({
           .select({
             ...getTableColumns(comments),
             user: users,
+            viewerReaction: viewerReactions.type,
             likeCount: db.$count(
               commentReactions,
               and(
@@ -81,6 +114,10 @@ export const commentsRouter = createTRPCRouter({
             ),
           )
           .innerJoin(users, eq(users.id, comments.userId))
+          .innerJoin(
+            viewerReactions,
+            eq(viewerReactions.commentId, comments.id),
+          )
           .orderBy(desc(comments.updatedAt), desc(comments.id))
           .limit(limit + 1),
       ])
