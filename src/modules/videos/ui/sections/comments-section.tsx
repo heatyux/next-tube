@@ -28,7 +28,7 @@ export const CommentsSection = ({ videoId }: CommentsSectionProps) => {
 const CommentsSectionSkeleton = () => {
   return (
     <div className="mt-6 flex items-center justify-center">
-      <Loader2Icon className="text-muted-foreground animete-spin size-7" />
+      <Loader2Icon className="text-muted-foreground size-7 animate-spin" />
     </div>
   )
 }
