@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { UserAvatar } from '@/components/user-avatar'
+import { cn } from '@/lib/utils'
 import { trpc } from '@/trpc/client'
 
 import { CommentGetManyOutput } from '../../types'
@@ -75,7 +76,11 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 size="icon"
                 className="size-8 rounded-full"
               >
-                <ThumbsUpIcon />
+                <ThumbsUpIcon
+                  className={cn(
+                    comment.viewerReaction === 'like' && 'fill-black',
+                  )}
+                />
               </Button>
               <span className="text-muted-foreground text-xs">
                 {comment.likeCount}
@@ -87,7 +92,11 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 size="icon"
                 className="size-8 rounded-full"
               >
-                <ThumbsDownIcon />
+                <ThumbsDownIcon
+                  className={cn(
+                    comment.viewerReaction === 'dislike' && 'fill-black',
+                  )}
+                />
               </Button>
               <span className="text-muted-foreground text-xs">
                 {comment.dislikeCount}
