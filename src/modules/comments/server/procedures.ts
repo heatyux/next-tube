@@ -61,7 +61,7 @@ export const commentsRouter = createTRPCRouter({
         userId = user.id
       }
 
-      const viewerReactions = db.$with('comment_reactions').as(
+      const viewerReactions = db.$with('viewer_reactions').as(
         db
           .select({
             commentId: commentReactions.commentId,

@@ -48,6 +48,34 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
     },
   })
 
+  const like = trpc.commentReactions.like.useMutation({
+    onSuccess: () => {
+      utils.comments.getMany.invalidate({ videoId: comment.videoId })
+    },
+    onError: (error) => {
+      toast.error('Something went wrong')
+
+      if (error.data?.code === 'UNAUTHORIZED') {
+        clerk.openSignIn()
+      }
+    },
+  })
+
+  const dislike = trpc.commentReactions.dislike.useMutation({
+    onSuccess: () => {
+      utils.comments.getMany.invalidate({ videoId: comment.videoId })
+    },
+    onError: (error) => {
+      toast.error('Something went wrong')
+
+      if (error.data?.code === 'UNAUTHORIZED') {
+        clerk.openSignIn()
+      }
+    },
+  })
+
+  const isPending = like.isPending || dislike.isPending || remove.isPending
+
   return (
     <div>
       <div className="flex gap-4">
@@ -74,7 +102,9 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 rounded-full"
+                className="size-8 rounded-full disabled:cursor-not-allowed"
+                disabled={isPending}
+                onClick={() => like.mutate({ commentId: comment.id })}
               >
                 <ThumbsUpIcon
                   className={cn(
@@ -90,7 +120,9 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="size-8 rounded-full"
+                className="size-8 rounded-full disabled:cursor-not-allowed"
+                disabled={isPending}
+                onClick={() => dislike.mutate({ commentId: comment.id })}
               >
                 <ThumbsDownIcon
                   className={cn(
@@ -117,6 +149,8 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
             </DropdownMenuItem>
             {userId === comment.user.clerkId && (
               <DropdownMenuItem
+                className="disabled:cursor-not-allowed"
+                disabled={isPending}
                 onClick={() => remove.mutate({ id: comment.id })}
               >
                 <Trash2Icon className="size-4" />
