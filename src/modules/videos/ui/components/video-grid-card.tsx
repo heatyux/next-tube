@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { VideoGetManyOutput } from '../../types'
+import { VideoInfo } from './video-info'
 import { VideoThumbnail } from './video-thumbnail'
 
 interface VideoGridCardProps {
@@ -19,6 +20,7 @@ export const VideoGridCard = ({ data, onRemove }: VideoGridCardProps) => {
           duration={data.duration}
         />
       </Link>
+      <VideoInfo data={data} onRemove={onRemove} />
     </div>
   )
 }
