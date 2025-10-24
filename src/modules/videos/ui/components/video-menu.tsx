@@ -21,7 +21,11 @@ interface VideoMenuProps {
 }
 
 // TODO: Implement the remaining functionlity
-export const VideoMenu = ({ videoId, variant, onRemove }: VideoMenuProps) => {
+export const VideoMenu = ({
+  videoId,
+  variant = 'ghost',
+  onRemove,
+}: VideoMenuProps) => {
   const onShare = () => {
     const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/videos/${videoId}`
     navigator.clipboard.writeText(fullUrl)
