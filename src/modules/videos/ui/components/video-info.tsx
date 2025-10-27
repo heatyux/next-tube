@@ -45,7 +45,7 @@ export const VideoInfo = ({ data, onRemove }: VideoInfoProps) => {
           </p>
         </Link>
       </div>
-      <div className="shrink-0 gap-3">
+      <div className="shrink-0">
         <VideoMenu videoId={data.id} onRemove={onRemove} />
       </div>
     </div>
