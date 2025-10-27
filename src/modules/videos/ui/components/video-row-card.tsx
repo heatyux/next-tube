@@ -15,7 +15,7 @@ import { UserInfo } from '@/modules/users/ui/components/user-info'
 
 import { VideoGetManyOutput } from '../../types'
 import { VideoMenu } from './video-menu'
-import { VideoThumbnail } from './video-thumbnail'
+import { VideoThumbnail, VideoThumbnailSkeleton } from './video-thumbnail'
 
 const videoRowCardVariants = cva('group flex min-w-0', {
   variants: {
@@ -46,10 +46,34 @@ interface VideoRowCardProps extends VariantProps<typeof videoRowCardVariants> {
   onRemove?: () => void
 }
 
-export const VideoRowCardSkeleton = () => {
+export const VideoRowCardSkeleton = ({
+  size,
+}: VariantProps<typeof videoRowCardVariants>) => {
   return (
-    <div>
-      <Skeleton />
+    <div className={videoRowCardVariants({ size })}>
+      {/* Thumbnail Skeleton */}
+      <VideoThumbnailSkeleton />
+
+      {/* Info Skeleton */}
+      <div className="min-w-0 flex-1">
+        <div className="flex justify-between gap-x-2">
+          <div className="min-w-0 flex-1">
+            <Skeleton
+              className={cn('h-5 w-[40%]', size === 'compact' && 'h-4 w-[40%]')}
+            />
+            {size === 'default' && (
+              <>
+                <Skeleton className="mt-1 h-4 w-[20%]" />
+                <div className="my-3 flex items-center gap-2">
+                  <Skeleton className="size-8 rounded-full" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </>
+            )}
+            {size === 'compact' && <Skeleton className="mt-1 h-4 w-[50%]" />}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
