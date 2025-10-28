@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+import { APP_URL } from '@/constants'
+
 export const SearchInput = () => {
   const router = useRouter()
 
@@ -15,7 +17,7 @@ export const SearchInput = () => {
 
     const url = new URL(
       '/search',
-      process.env.VERCEL_URL ?? 'http://localhost:3000',
+      APP_URL !== undefined ? `https://${APP_URL}` : 'http://localhost:3000',
     )
     const newQuery = value.trim()
 

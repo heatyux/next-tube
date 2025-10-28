@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { APP_URL } from '@/constants'
 import { videoUpdateSchema } from '@/db/schema'
 import { snakeCaseToTitle } from '@/lib/utils'
 import { THUMBNAIL_FALLBACK } from '@/modules/videos/constants'
@@ -175,7 +176,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     await update.mutateAsync(data)
   }
 
-  const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL}/video/${videoId}`
+  const fullUrl = `${APP_URL !== undefined ? `https://${APP_URL}` : 'http://localhost:3000'}/video/${videoId}`
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(fullUrl)
