@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+import { Button } from '@/components/ui/button'
 import { APP_URL } from '@/constants'
 
 export const SearchInput = () => {
@@ -33,16 +34,29 @@ export const SearchInput = () => {
   }
 
   return (
-    <form className="flex w-full max-w-[600px]">
+    <form onSubmit={handleSearch} className="flex w-full max-w-[600px]">
       <div className="relative w-full">
         <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           type="text"
           placeholder="Search"
-          className="w-full rounded-l-full border py-2 pr-12 pl-4 focus:border-blue-500 focus:outline-none"
+          className="w-full rounded-l-full border py-2 pr-12 pl-4 text-gray-500 focus:border-blue-500 focus:outline-none"
         />
-        {/* TODO: add remove search button */}
+        {value && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute top-[50%] right-2 -translate-1/2 rounded-full"
+            onClick={() => setValue('')}
+          >
+            <XIcon className="text-gray-500" />
+          </Button>
+        )}
       </div>
       <button
+        disabled={!value.trim()}
         type="submit"
         className="rounded-r-full border border-l-0 bg-gray-100 px-5 py-2.5 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
       >
