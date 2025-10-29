@@ -6,8 +6,6 @@ import { ClapperboardIcon, UserCircleIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const AuthButton = () => {
-  // TODO: add different auth states
-
   return (
     <>
       <SignedOut>

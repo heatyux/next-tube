@@ -219,13 +219,15 @@ export const videosRouter = createTRPCRouter({
         })
       }
 
-      const upload = await mux.video.uploads.retrieve(existingVideo.muxUploadId)
+      const directUpload = await mux.video.uploads.retrieve(
+        existingVideo.muxUploadId,
+      )
 
-      if (!upload || !upload.asset_id) {
+      if (!directUpload || !directUpload.asset_id) {
         throw new TRPCError({ code: 'BAD_REQUEST' })
       }
 
-      const asset = await mux.video.assets.retrieve(upload.asset_id)
+      const asset = await mux.video.assets.retrieve(directUpload.asset_id)
       const duration = asset.duration ? Math.round(asset.duration * 1000) : 0
 
       if (!asset) {
@@ -233,7 +235,7 @@ export const videosRouter = createTRPCRouter({
       }
 
       // TODO: Potentially find a way to revalidate track
-      const [uploadVideo] = await db
+      const [updatedVideo] = await db
         .update(videos)
         .set({
           muxStatus: asset.status,
@@ -244,7 +246,7 @@ export const videosRouter = createTRPCRouter({
         .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
         .returning()
 
-      return uploadVideo
+      return updatedVideo
     }),
   restoreThumbnail: protectedProcedure
     .input(z.object({ id: z.uuid() }))
