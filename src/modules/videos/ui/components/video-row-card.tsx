@@ -52,7 +52,9 @@ export const VideoRowCardSkeleton = ({
   return (
     <div className={videoRowCardVariants({ size })}>
       {/* Thumbnail Skeleton */}
-      <VideoThumbnailSkeleton />
+      <div className={thumbnailVariants({ size })}>
+        <VideoThumbnailSkeleton />
+      </div>
 
       {/* Info Skeleton */}
       <div className="min-w-0 flex-1">
@@ -124,7 +126,7 @@ export const VideoRowCard = ({
             )}
             {size === 'default' && (
               <>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="my-3 flex items-center gap-2">
                   <UserAvatar
                     size="sm"
                     imageUrl={data.user.imageUrl}
