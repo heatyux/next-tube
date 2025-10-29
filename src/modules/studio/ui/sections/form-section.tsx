@@ -176,7 +176,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     await update.mutateAsync(data)
   }
 
-  const fullUrl = `${APP_URL !== undefined ? `https://${APP_URL}` : 'http://localhost:3000'}/video/${videoId}`
+  const fullUrl = `${APP_URL}/video/${videoId}`
 
   const onCopy = async () => {
     await navigator.clipboard.writeText(fullUrl)
