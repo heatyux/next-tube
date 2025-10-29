@@ -26,7 +26,7 @@ export const searchRouter = createTRPCRouter({
       const data = await db
         .select({
           ...getTableColumns(videos),
-          users: users,
+          user: users,
           viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
           likeCount: db.$count(
             videoReactions,
