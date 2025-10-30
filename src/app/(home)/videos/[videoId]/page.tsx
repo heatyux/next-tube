@@ -6,6 +6,8 @@ interface VideoIdPageProps {
   params: Promise<{ videoId: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 const VideoIdPage = async ({ params }: VideoIdPageProps) => {
   const { videoId } = await params
 

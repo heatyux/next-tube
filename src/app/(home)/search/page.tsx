@@ -9,6 +9,8 @@ interface SearchPageProps {
   }>
 }
 
+export const dynamic = 'force-dynamic'
+
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const { query, categoryId } = await searchParams
 
