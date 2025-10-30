@@ -1,5 +1,14 @@
 import { TRPCError } from '@trpc/server'
-import { and, eq, getTableColumns, inArray, isNotNull } from 'drizzle-orm'
+import {
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  isNotNull,
+  lt,
+  or,
+} from 'drizzle-orm'
 import { UTApi } from 'uploadthing/server'
 import z from 'zod'
 
@@ -103,6 +112,78 @@ export const videosRouter = createTRPCRouter({
       }
 
       return existingVideo
+    }),
+  getMany: baseProcedure
+    .input(
+      z.object({
+        categoryId: z.uuid().nullish(),
+        cursor: z
+          .object({
+            id: z.uuid(),
+            updatedAt: z.date(),
+          })
+          .nullish(),
+        limit: z.number().min(1).max(100),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { categoryId, cursor, limit } = input
+
+      const data = await db
+        .select({
+          ...getTableColumns(videos),
+          user: users,
+          viewCount: db.$count(videoViews, eq(videoViews.videoId, videos.id)),
+          likeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, 'like'),
+            ),
+          ),
+          dislikeCount: db.$count(
+            videoReactions,
+            and(
+              eq(videoReactions.videoId, videos.id),
+              eq(videoReactions.type, 'dislike'),
+            ),
+          ),
+        })
+        .from(videos)
+        .innerJoin(users, eq(videos.userId, users.id))
+        .where(
+          and(
+            eq(videos.visibility, 'public'),
+            categoryId ? eq(videos.categoryId, categoryId) : undefined,
+            cursor
+              ? or(
+                  lt(videos.updatedAt, cursor.updatedAt),
+                  and(
+                    eq(videos.updatedAt, cursor.updatedAt),
+                    lt(videos.id, cursor.id),
+                  ),
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(videos.updatedAt), desc(videos.id))
+        .limit(limit + 1)
+
+      const hasMore = data.length > limit
+
+      // Remove the last item if there is more
+      const items = hasMore ? data.slice(0, -1) : data
+
+      // Set the next cursor to the last item if there is more data
+      const lastItem = items[items.length - 1]
+      const nextCursor = hasMore
+        ? { id: lastItem.id, updatedAt: lastItem.updatedAt }
+        : null
+
+      return {
+        items,
+        nextCursor,
+      }
     }),
   create: protectedProcedure.mutation(async ({ ctx }) => {
     const { id: userId } = ctx.user
