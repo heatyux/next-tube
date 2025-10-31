@@ -106,6 +106,7 @@ export const videoRelations = relations(videos, ({ one, many }) => ({
   videoView: many(videoViews),
   videoReaction: many(videoReactions),
   comments: many(comments),
+  playlistVideos: many(playlistVideos),
 }))
 
 export const videoInsertSchema = createInsertSchema(videos)
@@ -312,9 +313,45 @@ export const playlists = pgTable('playlists', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
-export const playlistsRelations = relations(playlists, ({ one }) => ({
+export const playlistsRelations = relations(playlists, ({ one, many }) => ({
   user: one(users, {
     fields: [playlists.userId],
     references: [users.id],
+  }),
+  playlistVideos: many(playlistVideos),
+}))
+
+export const playlistVideos = pgTable(
+  'playlist_videos',
+  {
+    playlistId: uuid('playlist_id')
+      .references(() => playlists.id, {
+        onDelete: 'cascade',
+      })
+      .notNull(),
+    videoId: uuid('video_id')
+      .references(() => videos.id, {
+        onDelete: 'cascade',
+      })
+      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({
+      name: 'pk_playlist_videos',
+      columns: [t.playlistId, t.videoId],
+    }),
+  ],
+)
+
+export const playlistVideosRelations = relations(playlistVideos, ({ one }) => ({
+  playlist: one(playlists, {
+    fields: [playlistVideos.playlistId],
+    references: [playlists.id],
+  }),
+  video: one(videos, {
+    fields: [playlistVideos.videoId],
+    references: [videos.id],
   }),
 }))
