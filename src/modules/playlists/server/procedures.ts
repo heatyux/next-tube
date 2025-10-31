@@ -1,11 +1,38 @@
+import { TRPCError } from '@trpc/server'
 import { and, desc, eq, getTableColumns, lt, or } from 'drizzle-orm'
 import z from 'zod'
 
 import { db } from '@/db'
-import { users, videoReactions, videoViews, videos } from '@/db/schema'
+import {
+  playlists,
+  users,
+  videoReactions,
+  videoViews,
+  videos,
+} from '@/db/schema'
 import { createTRPCRouter, protectedProcedure } from '@/trpc/init'
 
 export const playlistsRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user
+      const { name } = input
+
+      const [createdPlaylist] = await db
+        .insert(playlists)
+        .values({ name, userId })
+        .returning()
+
+      if (!createdPlaylist) {
+        throw new TRPCError({ code: 'BAD_REQUEST' })
+      }
+      return createdPlaylist
+    }),
   getHistory: protectedProcedure
     .input(
       z.object({
