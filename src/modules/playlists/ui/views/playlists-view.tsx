@@ -7,6 +7,7 @@ import { PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import { PlaylistCreateModal } from '../../components/playlist-create-modal'
+import { PlaylistsSection } from '../sections/playlists-section'
 
 export const PlaylistsView = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -30,6 +31,7 @@ export const PlaylistsView = () => {
         </Button>
       </div>
       <PlaylistCreateModal open={isOpen} onOpenChange={setIsOpen} />
+      <PlaylistsSection />
     </div>
   )
 }
