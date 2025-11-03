@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { and, desc, eq, getTableColumns, lt, or, sql } from 'drizzle-orm'
+import { and, desc, eq, exists, getTableColumns, lt, or } from 'drizzle-orm'
 import z from 'zod'
 
 import { db } from '@/db'
@@ -119,9 +119,21 @@ export const playlistsRouter = createTRPCRouter({
             playlistVideos,
             eq(playlistVideos.playlistId, playlists.id),
           ),
-          containsVideo: videoId
-            ? sql<boolean>`SELECT EXISTS (SELECT 1 FROM ${playlistVideos} pv WHERE pv.playlistId = ${playlists.id} AND pv.videoId = ${videoId})`
-            : sql<boolean>`false`,
+          // containsVideo: videoId
+          //   ? sql<boolean>`SELECT EXISTS (SELECT 1 FROM ${playlistVideos} pv WHERE pv.playlistId = ${playlists.id} AND pv.videoId = ${videoId})`
+          //   : sql<boolean>`false`,
+          // HACK: Deepseek generated this code because the code above is faulty
+          containsVideo: exists(
+            db
+              .select()
+              .from(playlistVideos)
+              .where(
+                and(
+                  eq(playlistVideos.playlistId, playlists.id),
+                  eq(playlistVideos.videoId, videoId),
+                ),
+              ),
+          ).as('containsVideo'),
         })
         .from(playlists)
         .innerJoin(users, eq(playlists.userId, users.id))
