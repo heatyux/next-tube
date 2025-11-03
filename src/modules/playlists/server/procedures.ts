@@ -239,6 +239,77 @@ export const playlistsRouter = createTRPCRouter({
 
       return createdPlaylistVideo
     }),
+  removeVideo: protectedProcedure
+    .input(
+      z.object({
+        playlistId: z.uuid(),
+        videoId: z.uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user
+      const { playlistId, videoId } = input
+
+      const [existingPlaylist] = await db
+        .select()
+        .from(playlists)
+        .where(eq(playlists.id, playlistId))
+
+      if (!existingPlaylist) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Playlist not found',
+        })
+      }
+
+      if (existingPlaylist.userId !== userId) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'You do not own this playlist',
+        })
+      }
+
+      const [existingVideo] = await db
+        .select()
+        .from(videos)
+        .where(eq(videos.id, videoId))
+
+      if (!existingVideo) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Video not found',
+        })
+      }
+
+      const [existingPlaylistVideo] = await db
+        .select()
+        .from(playlistVideos)
+        .where(
+          and(
+            eq(playlistVideos.playlistId, playlistId),
+            eq(playlistVideos.videoId, videoId),
+          ),
+        )
+
+      if (!existingPlaylistVideo) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'The video is not in the playlist',
+        })
+      }
+
+      const [deletedPlaylistVideo] = await db
+        .delete(playlistVideos)
+        .where(
+          and(
+            eq(playlistVideos.playlistId, playlistId),
+            eq(playlistVideos.videoId, videoId),
+          ),
+        )
+        .returning()
+
+      return deletedPlaylistVideo
+    }),
   getHistory: protectedProcedure
     .input(
       z.object({
