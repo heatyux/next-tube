@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { and, desc, eq, getTableColumns, lt, or } from 'drizzle-orm'
+import { and, desc, eq, getTableColumns, lt, or, sql } from 'drizzle-orm'
 import z from 'zod'
 
 import { db } from '@/db'
@@ -58,6 +58,70 @@ export const playlistsRouter = createTRPCRouter({
             playlistVideos,
             eq(playlistVideos.playlistId, playlists.id),
           ),
+        })
+        .from(playlists)
+        .innerJoin(users, eq(playlists.userId, users.id))
+        .where(
+          and(
+            eq(playlists.userId, userId),
+            cursor
+              ? or(
+                  lt(playlists.updatedAt, cursor.updatedAt),
+                  and(
+                    eq(playlists.updatedAt, cursor.updatedAt),
+                    lt(playlists.id, cursor.id),
+                  ),
+                )
+              : undefined,
+          ),
+        )
+        .orderBy(desc(playlists.updatedAt), desc(playlists.id))
+        .limit(limit + 1)
+
+      const hasMore = data.length > limit
+
+      // Remove the last item if there is more
+      const items = hasMore ? data.slice(0, -1) : data
+
+      // Set the next cursor to the last item if there is more data
+      const lastItem = items[items.length - 1]
+      const nextCursor = hasMore
+        ? { id: lastItem.id, updatedAt: lastItem.updatedAt }
+        : null
+
+      return {
+        items,
+        nextCursor,
+      }
+    }),
+  getManyForVideo: protectedProcedure
+    .input(
+      z.object({
+        videoId: z.uuid(),
+        cursor: z
+          .object({
+            id: z.uuid(),
+            updatedAt: z.date(),
+          })
+          .nullish(),
+        limit: z.number().min(1).max(100),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user
+      const { videoId, cursor, limit } = input
+
+      const data = await db
+        .select({
+          ...getTableColumns(playlists),
+          user: users,
+          playlistVideoCount: db.$count(
+            playlistVideos,
+            eq(playlistVideos.playlistId, playlists.id),
+          ),
+          containsVideo: videoId
+            ? sql<boolean>`SELECT EXISTS (SELECT 1 FROM ${playlistVideos} pv WHERE pv.playlistId = ${playlists.id} AND pv.videoId = ${videoId})`
+            : sql<boolean>`false`,
         })
         .from(playlists)
         .innerJoin(users, eq(playlists.userId, users.id))
