@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 
 import { ErrorBoundary } from 'react-error-boundary'
+import { toast } from 'sonner'
 
 import { InfiniteScroll } from '@/components/infinite-scroll'
 import { DEFAULT_LIMIT } from '@/constants'
@@ -48,6 +49,8 @@ const VideosSectionSkeleton = () => {
 }
 
 const VideosSectionSuspense = ({ playlistId }: VideosSectionProps) => {
+  const utils = trpc.useUtils()
+
   const [videos, query] = trpc.playlists.getVideos.useSuspenseInfiniteQuery(
     {
       playlistId,
@@ -58,20 +61,45 @@ const VideosSectionSuspense = ({ playlistId }: VideosSectionProps) => {
     },
   )
 
+  const removeVideo = trpc.playlists.removeVideo.useMutation({
+    onSuccess: (data) => {
+      toast.success('Video removed from playlist')
+      utils.playlists.getMany.invalidate()
+      utils.playlists.getManyForVideo.invalidate({ videoId: data.videoId })
+      utils.playlists.getOne.invalidate({ playlistId: data.playlistId })
+      utils.playlists.getVideos.invalidate({ playlistId: data.playlistId })
+    },
+    onError: () => {
+      toast.error('Something went wrong')
+    },
+  })
+
   return (
     <div>
       <div className="flex flex-col gap-4 gap-y-10 md:hidden">
         {videos.pages
           .flatMap((page) => page.items)
           .map((video) => (
-            <VideoGridCard key={video.id} data={video} />
+            <VideoGridCard
+              key={video.id}
+              data={video}
+              onRemove={() =>
+                removeVideo.mutate({ playlistId, videoId: video.id })
+              }
+            />
           ))}
       </div>
       <div className="hidden flex-col gap-4 md:flex">
         {videos.pages
           .flatMap((page) => page.items)
           .map((video) => (
-            <VideoRowCard key={video.id} data={video} />
+            <VideoRowCard
+              key={video.id}
+              data={video}
+              onRemove={() =>
+                removeVideo.mutate({ playlistId, videoId: video.id })
+              }
+            />
           ))}
       </div>
       <InfiniteScroll
