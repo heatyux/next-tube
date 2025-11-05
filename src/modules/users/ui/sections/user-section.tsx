@@ -6,6 +6,8 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { trpc } from '@/trpc/client'
 
+import { UserPageBanner } from '../components/user-page-banner'
+
 interface UserSectionProps {
   userId: string
 }
@@ -21,7 +23,11 @@ export const UserSection = ({ userId }: UserSectionProps) => {
 }
 
 const UserSectionSuspense = ({ userId }: UserSectionProps) => {
-  const [data] = trpc.users.getOne.useSuspenseQuery({ id: userId })
+  const [user] = trpc.users.getOne.useSuspenseQuery({ id: userId })
 
-  return <div>{JSON.stringify(data)}</div>
+  return (
+    <div>
+      <UserPageBanner user={user} />
+    </div>
+  )
 }
