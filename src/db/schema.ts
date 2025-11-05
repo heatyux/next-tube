@@ -27,7 +27,8 @@ export const users = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     clerkId: varchar('clerk_id').unique().notNull(),
     name: text('name').notNull(),
-    // TODO: add banner fields
+    bannerKey: text('banner_key'),
+    bannerUrl: text('banner_url'),
     imageUrl: text('image_url').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
