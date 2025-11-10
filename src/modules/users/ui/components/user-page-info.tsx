@@ -2,6 +2,7 @@ import { useAuth, useClerk } from '@clerk/nextjs'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { UserAvatar } from '@/components/user-avatar'
 import { cn } from '@/lib/utils'
 import { useSubscription } from '@/modules/subscriptions/hooks/use-subscription'
@@ -11,6 +12,34 @@ import { UsersGetOneOutput } from '../../types'
 
 interface UserPageInfoProps {
   user: UsersGetOneOutput
+}
+
+export const UserPageInfoSkeleton = () => {
+  return (
+    <div className="py-6">
+      {/* Mobile Layout */}
+      <div className="flex flex-col md:hidden">
+        <div className="flex items-center gap-6">
+          <Skeleton className="size-[60px] rounded-full" />
+          <div className="min-w-0 flex-1">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="mt-1 h-6 w-48" />
+          </div>
+        </div>
+        <Skeleton className="mt-3 h-10 w-full rounded-full" />
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden items-start gap-4 md:flex">
+        <Skeleton className="size-[160px] rounded-full" />
+        <div className="min-w-0 flex-1">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="mt-4 h-5 w-48" />
+          <Skeleton className="mt-3 h-10 w-32" />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export const UserPageInfo = ({ user }: UserPageInfoProps) => {
