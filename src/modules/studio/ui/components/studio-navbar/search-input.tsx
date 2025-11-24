@@ -1,8 +1,6 @@
 import { SearchIcon } from 'lucide-react'
 
 export const SearchInput = () => {
-  // TODO: add search functionality
-
   return (
     <form className="flex w-full max-w-[600px]">
       <div className="relative w-full">
@@ -11,7 +9,6 @@ export const SearchInput = () => {
           placeholder="Search"
           className="w-full rounded-l-full border py-2 pr-12 pl-4 focus:border-blue-500 focus:outline-none"
         />
-        {/* TODO: add remove search button */}
       </div>
       <button
         type="submit"
