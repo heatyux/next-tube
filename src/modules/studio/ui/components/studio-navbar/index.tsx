@@ -5,7 +5,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { AuthButton } from '@/modules/auth/ui/components/auth-button'
 
 import { StudioUploadModal } from '../studio-upload-modal'
-import { SearchInput } from './search-input'
 
 export const StudioNavbar = () => {
   return (
@@ -20,11 +19,6 @@ export const StudioNavbar = () => {
               <p className="text-xl font-semibold tracking-tight">Studio</p>
             </div>
           </Link>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mx-auto flex max-w-[700px] flex-1 justify-center">
-          <SearchInput />
         </div>
       </div>
 
